@@ -1,0 +1,148 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<script runat="server">
+
+</script>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<meta name="viewport" content="width=device-width,user-scalable=no">
+
+<head runat="server">
+<title>Arm</title>
+</head>
+
+<body>
+
+<CENTER>
+    <canvas id="viewport" style="border:10px solid #aaaaaa;">> Your browser does not support the canvas element.</canvas>	
+</CENTER>
+
+<script type="text/javascript" charset="utf-8">
+
+    // Place everything in anonymous function, called on window load.
+    if (window.addEventListener) 
+	{
+		window.addEventListener('load', function () 
+		{
+			
+			// Variables
+            var canvas, context;			
+			var x_centre = 0, y_centre = 0;
+			var x_pos = 0, y_pos = 0;
+			var angle_A = 0;
+			var angle_B = 0;
+			var end_A_x = 0, end_A_y = 0;
+			var end_B_x = 0, end_B_y = 0;
+						
+			// Progamme
+            init();
+			
+			// Function Definitions
+			//---------------------
+			
+            // Initialization
+            function init() {
+                // Find the canvas element.
+                canvas = document.getElementById('viewport');
+                canvas.style.cursor = "none";                         // Turn Off Cursor
+				//canvas.style.border = "none";						  // Turn Off Border
+
+                // Get the 2D canvas context
+                context = canvas.getContext('2d');
+				
+				// Attach the event handlers
+				window.addEventListener("resize", ev_resize);
+				canvas.addEventListener('mousemove', ev_mousemove, false);
+
+				// Partial Window Canvas
+                canvas.width = window.innerWidth/2;
+                canvas.height = window.innerHeight/2;
+                canvas.width = canvas.width; // Clears the canvas		
+				
+				// Call redraw() to finish initialization
+                redraw();				
+            }
+			
+			// Redraw canvas
+            function redraw() {
+				// Partial Window Canvas
+                canvas.width = window.innerWidth/1.1;
+                canvas.height = window.innerHeight/1.1;
+                canvas.width = canvas.width; // Clears the canvas
+				
+				// Compute canvas centre
+				x_centre = canvas.width/2;
+				y_centre = canvas.height/2;
+				
+				// Measure joint angles
+				angle_A = x_pos/100;
+				angle_B = y_pos/50;
+				
+				// Draw Joints and Limbs
+				var length = 100;
+				draw_grey_circle(x_centre,y_centre,15, 0, 1.0);
+				var end_ptA = draw_limb(x_centre,y_centre,angle_A, length, 2, 255, 0.5);
+				draw_grey_circle(end_ptA[0],end_ptA[1],5, 0, 1.0);
+				var end_ptB = draw_limb(end_ptA[0],end_ptA[1],angle_B, length, 2, 255, 0.5);
+				draw_grey_circle(end_ptB[0],end_ptB[1],11, 0, 1.0);
+			}
+						
+			// The ev_resize event handler.
+            function ev_resize(e) 
+			{
+                redraw();
+            }
+			
+			// The ev_mousemove event handler.
+            function ev_mousemove(e) 
+			{
+				// Update Joint Angles
+				x_pos = e.pageX - this.offsetLeft;
+				y_pos = e.pageY - this.offsetTop;
+			
+				redraw();
+            }
+		
+		
+			// Draw Limb: anchor x:y, angle, length, width, intensity
+			function draw_limb(x, y, ort, length, width, intensity, alpha) 
+			{
+				var end_point = [];
+				color = "rgba( " + intensity + ", " + 0.0 + ", " + 0.0 + ", " + alpha + ")";
+				context.strokeStyle = color;
+				context.beginPath();
+				offX = Math.cos(ort)*length;
+				offY = Math.sin(ort)*length;
+				context.moveTo(x, y);
+				context.lineTo(x+offX, y+offY);
+				context.lineWidth = width;
+				context.stroke();
+				end_point.push(x+offX);
+				end_point.push(y+offY);
+				return end_point;
+			}
+
+			// Draw Circle
+			function draw_grey_circle(x, y, radius, intensity, alpha) {
+				color = "rgba( " + intensity + ", " + intensity + ", " + intensity + ", " + alpha + ")";
+				context.fillStyle = color;
+				context.strokeStyle = color;
+				context.beginPath();
+				context.arc(x, y, radius, 0, Math.PI * 2, true);
+				context.closePath();
+				context.stroke();
+				context.fill();
+			}
+			
+			// Draw Debug Text
+			function draw_debug_text(x, y, string) {
+				context.font = 'bold 10pt Calibri';
+				context.fillText(string, x, y);
+			}
+       
+	   }, false);
+    }
+    </script>
+
+</body>
+</html>
