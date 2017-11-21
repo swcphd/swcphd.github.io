@@ -53,6 +53,7 @@
 				// Attach the event handlers
 				window.addEventListener("resize", ev_resize);
 				canvas.addEventListener('mousemove', ev_mousemove, false);
+				canvas.addEventListener('touchmove', ev_touchmove, false);
 
 				// Partial Window Canvas
                 canvas.width = window.innerWidth/2;
@@ -94,6 +95,16 @@
             }
 			
 			// The ev_mousemove event handler.
+            function ev_mousemove(e) 
+			{
+				// Update Joint Angles
+				x_pos = e.touches[0].clientX  - this.offsetLeft;
+				y_pos = e.touches[0].clientY - this.offsetTop;
+			
+				redraw();
+            }
+			
+			// The ev_touchmove event handler.
             function ev_mousemove(e) 
 			{
 				// Update Joint Angles
